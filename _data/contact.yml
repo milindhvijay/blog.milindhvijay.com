@@ -1,0 +1,22 @@
+#  The contact options.
+
+- type: linkedin
+  icon: 'fab fa-linkedin'
+  url: 'https://linkedin.com/in/milindhvijay'
+# -
+- type: twitter
+  icon: 'fab fa-x-twitter'
+  url: 'https://twitter.com/milindhvijay'
+
+- type: github
+  icon: 'fab fa-github'
+  url: 'https://github.com/milindhvijay'
+
+- type: email
+  icon: "fas fa-envelope"
+  noblank: true
+
+- type: website
+  icon: "fa-solid fa-globe"
+  url: 'https://milindhvijay.com'
+
