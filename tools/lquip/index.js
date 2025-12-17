@@ -6,7 +6,7 @@ async function ls(path) {
   console.log('starting')
   const dir = await fs.promises.opendir(path)
   for await (const file of dir) {
-    if (file.name.includes('.jpg')) {
+    if (file.name.includes('.jpg') || file.name.includes('.webp')) {
       lqip.base64(`${path}/${file.name}`).then(res => {
         console.log(' ')
         console.log(file.name)
