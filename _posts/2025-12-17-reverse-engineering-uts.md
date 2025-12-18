@@ -58,7 +58,7 @@ public static boolean isAccuracyFine(double d, Context context) {
 - **≤ 2 meters**: Gets flagged as a likely **mock/spoofed location** (suspiciously perfect). *Note: This threshold may be overly aggressive for modern dual-frequency GPS devices (most flagship phones since 2018), which can routinely achieve 1-2m accuracy with L5 band support.*
 - **> 75 meters**: Tossed out as unreliable
 
-That "7 meters" message from the tweet? Based on the error wording ("stand 7 meter away"), the server appears to be using the GPS accuracy value directly as the required buffer distance. In other words, the buffer equals your reported accuracy—so with 7m accuracy, you need to be at least 7m from the geofence boundary. The app takes your GPS accuracy reading to their backend, which then runs its own distance calculations using this value as a dynamic buffer.
+That "7 meters" message from the tweet? Based on the error wording ("stand 7 meter away"), the server appears to be using the GPS accuracy value directly as the required buffer distance. In other words, the buffer equals your reported accuracy, so with 7m accuracy, you need to be at least 7m from the geofence boundary. The app takes your GPS accuracy reading to their backend, which then runs its own distance calculations using this value as a dynamic buffer.
 
 ### Multi-Layer Location Validation
 
@@ -168,7 +168,7 @@ public class LocationFilter {
 }
 ```
 
-**Impact:** A GPS signal that's jumping erratically between 5m and 50m accuracy would smooth out into a stable trajectory. The server wouldn't see wild fluctuations triggering geofence violations—it would receive statistically smoothed position estimates instead.
+**Impact:** A GPS signal that's jumping erratically between 5m and 50m accuracy would smooth out into a stable trajectory. The server wouldn't see wild fluctuations triggering geofence violations; it would receive statistically smoothed position estimates instead.
 
 *Technical note: Kalman filtering has diminishing returns as error covariance converges. This differs from image stacking, where noise reduces proportionally to √n.*
 
@@ -207,7 +207,7 @@ state = [latitude, longitude, velocity_x, velocity_y]
 
 **The Process:**
 
-1. **Predict Step**: Use velocity to forecast where you'll be next (involves non-linear physics). The prediction accounts for the actual time delta between readings—if 2 seconds pass and you're moving at 1 m/s, the prediction adjusts accordingly.
+1. **Predict Step**: Use velocity to forecast where you'll be next (involves non-linear physics). The prediction accounts for the actual time delta between readings. If 2 seconds pass and you're moving at 1 m/s, the prediction adjusts accordingly.
    - Walking north at 1 m/s with a 2-second gap? Predict you'll be 2 meters north
    - Standing still? Velocity decays toward zero over time
 
@@ -234,7 +234,7 @@ location = ekf.predict();
 ekf.update(newReading, reading.getAccuracy());
 ```
 
-**Reality Check:** Google's Fused Location Provider **already does sophisticated filtering internally**—likely using an Unscented Kalman Filter (UKF) or particle filter, which handle non-linearities even better than EKF without requiring Jacobian computation. The UTS app receives these smoothed location estimates from Android's location stack but then **discards the temporal information** by only examining single snapshots. It's like buying a Ferrari and never shifting out of first gear.
+**Reality Check:** Google's Fused Location Provider **already does sophisticated filtering internally**, likely using an Unscented Kalman Filter (UKF) or particle filter, which handle non-linearities even better than EKF without requiring Jacobian computation. The UTS app receives these smoothed location estimates from Android's location stack but then **discards the temporal information** by only examining single snapshots. It's like buying a Ferrari and never shifting out of first gear.
 
 ### Hysteresis to Prevent Boundary Flickering
 
@@ -309,12 +309,12 @@ The app does correctly use Google's **Fused Location Provider** (`GetCurrentLoca
 // From GetCurrentLocation.java
 private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000;      // 1 sec
 private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 2500; // 2.5 sec
-// NOTE: These values appear inverted—typically FASTEST_UPDATE should be shorter than UPDATE_INTERVAL.
+// NOTE: These values appear inverted; typically FASTEST_UPDATE should be shorter than UPDATE_INTERVAL.
 // This could be a bug in the app or the variable names may be misleading.
 
 mLocationRequest = new LocationRequest.Builder(1000)
     .setPriority(100)  // PRIORITY_HIGH_ACCURACY
-    .build();  // (simplified—full method shown below)
+    .build();  // (simplified, full method shown below)
 ```
 
 **Several code quality issues stand out here:**
@@ -333,7 +333,7 @@ mLocationRequest = new LocationRequest.Builder(1000)
        }
    }
    ```
-   Both branches of the `if/else` are **completely identical**—rendering the conditional statement pointless.
+   Both branches of the `if/else` are **completely identical**, rendering the conditional statement pointless.
 
 3. **Unused Constants**: Despite defining `UPDATE_INTERVAL_IN_MILLISECONDS = 1000`, the code **hardcodes `1000` directly** in the `LocationRequest.Builder()` constructor and `setIntervalMillis(1000)` calls instead of actually using the constant.
 
@@ -447,7 +447,7 @@ The app treats **every single user as a potential evader** and dumps raw technic
 
 Instead of hard-blocking users, **flag suspicious bookings** and let TTEs use their judgment:
 
-1.  **Color-Coded Tickets** (with accessibility considerations—use patterns or icons alongside colors for colorblind users):
+1.  **Color-Coded Tickets** (with accessibility considerations; use patterns or icons alongside colors for colorblind users):
     *   **< 2 mins ago**: Red background with warning icon (TTE immediately knows you just booked)
     *   **2-10 mins ago**: Yellow background with caution icon
     *   **> 10 mins ago**: Green background with checkmark icon
@@ -497,7 +497,7 @@ The developers prioritised:
 But neglected:
 - Helping users book tickets quickly
 
-The result? A system that makes it **harder for honest users** to book tickets than it is for determined fraudsters to bypass. While the app does check for mock locations and likely sends device attestation data (SafetyNet/Play Integrity), sufficiently motivated bad actors with rooted devices and sophisticated spoofing tools can still circumvent many of these protections—making the strict blocking of legitimate users even more frustrating.
+The result? A system that makes it **harder for honest users** to book tickets than it is for determined fraudsters to bypass. While the app does check for mock locations and likely sends device attestation data (SafetyNet/Play Integrity), sufficiently motivated bad actors with rooted devices and sophisticated spoofing tools can still circumvent many of these protections, making the strict blocking of legitimate users even more frustrating.
 
 ### Lessons
 
@@ -520,7 +520,7 @@ The fix isn't more complex code but fundamentally rethinking the problem:
 
 ---
 
-*This analysis is based on reverse engineering the UTS Android app (com.cris.utsmobile). The iOS app may have different implementation details. All code snippets are from decompiled sources and are shared for educational/analytical purposes. Server-side behaviour is inferred from client-side code and error messages—actual server implementation may differ.*
+*This analysis is based on reverse engineering the UTS Android app (com.cris.utsmobile). The iOS app may have different implementation details. All code snippets are from decompiled sources and are shared for educational/analytical purposes. Server-side behaviour is inferred from client-side code and error messages; actual server implementation may differ.*
 
 *Special thanks to [@spinesurgeon](https://x.com/spinesurgeon) for the original tweet that inspired this investigation.*
 
