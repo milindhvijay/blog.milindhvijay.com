@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Reverse Engineering the UTS App: When Over-Engineering Security Breaks UX"
-date: 2025-12-17 12:30:00 +0530
+date: 2025-12-17 10:30:00 +0530
 categories: [AppDev, Engineering, UX]
 tags: [UTS, GPS, Geofencing, Android, CRIS, IndianRailways, KalmanFilter]
 image:
