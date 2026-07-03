@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lqip": "^2.1.0"
+    "sharp": "^0.30.7"
   }
 }

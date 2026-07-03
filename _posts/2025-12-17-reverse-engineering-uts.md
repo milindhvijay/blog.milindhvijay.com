@@ -1,12 +1,13 @@
 ---
 layout: post
 title: "Reverse Engineering the UTS App: When Over-Engineering Security Breaks UX"
+description: "Deep dive into Indian Railways' UTS app geofencing issues. Reverse engineering reveals Kalman filtering failures and over-engineered anti-spoofing that blocks users."
 date: 2025-12-17 10:30:00 +0530
 categories: [AppDev, Engineering, UX]
 tags: [UTS, GPS, Geofencing, Android, CRIS, IndianRailways, KalmanFilter]
 image:
   path: /assets/img/headers/reverse-engineering-uts/UTS.webp
-  lqip: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAAYACgMBEQACEQEDEQH/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+gEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoLEQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APzk/Zw/bh+Jvhn4Q6XoWsDSpfhtcz6v4cP9naDptx40fURZabr90S909p4et9LXSNYvtGtntbJL9re48q5aSe2g1IfK8SZrmWFhmGAwGInDM3gqmI+tT+rrC0aM3VwsZYelUwmLtiYVIOrH2kJ0XKznGcLUYbcM8NZfifq+PzOrUnlsKvsaGHoU5PFzxkVh8RN4qrHF4WE8I6DlTVNfvOaVk461Z/k5421KfXPGfi7Wo9e1Sxj1jxPr+qJZQaTpqQ2aahqt3drawot4FWK3WYRRqoCqiAAACvRwOeY2OCwcatChiascLh41MRWqJVq9RUoKdaqqGFo0VUqyvOao0aVJSk/Z0qcLRXLi+FeHpYvFSjLM6cZYitJU6dSjyU06kmoQ9p7SpyRXux56lSdkuacpXk//2Q==
+  lqip: data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAACwAwCdASoUAAwAPm0skkWkIqGYBABABsSgCsAB369hzXPr6ejNkAD+6kgMmWAfOz5g1b95qSi5UnNMBaMvqAUGS+58xQCdUfpOCm6EW59vSFzR+lfqxaHbi9SF2EcAGMgyHVerSHTfWBfdvHMnjqKjaKgAAA==
 ---
 
 ##### Note: The discussion here is based on a [recent tweet by @spinesurgeon](https://x.com/spinesurgeon/status/1988978129701142835){:target="_blank"}.
@@ -493,7 +494,7 @@ The developers prioritised:
 - Reducing ticket fraud
 
 But neglected:
-- Helping users book tickets quickly
+- Helping users book tickets quickly and easily, without being blocked by overly strict GPS accuracy checks
 
 The result? A system that makes it **harder for honest users** to book tickets than it is for determined fraudsters to bypass. While the app does check for mock locations and likely sends device attestation data (SafetyNet/Play Integrity), sufficiently motivated bad actors with rooted devices and sophisticated spoofing tools can still circumvent many of these protections, making the strict blocking of legitimate users even more frustrating.
 

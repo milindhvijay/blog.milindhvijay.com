@@ -49,7 +49,7 @@ social:
     # - https://www.facebook.com/username
      - https://www.linkedin.com/in/milindhvijay
 
-# google_site_verification: google_meta_tag_verification # change to your verification string
+google_site_verification: google9b5533a070a391d8
 
 # ↑ --------------------------
 # The end of `jekyll-seo-tag` settings

@@ -1,12 +1,13 @@
 ---
 layout: post
 title: "Hacking My Way Around IPv6 Dynamic PD"
+description: "Fixing broken IPv6 connectivity caused by BSNL's 24-hour PPPoE resets and dynamic prefix delegation using DHCPv6 IA_NA and RA timer tweaks."
 date: 2023-12-27 13:27:11 +0530
 categories: [Network, IPv6]
-tags: [ipv6, internet, network, prefix, pd, BSNL, Jio, dynamic-pd, isp, AS9829]
+tags: [IPv6, internet, network, prefix, pd, BSNL, Jio, dynamic-pd, isp, AS9829]
 image:
   path: /assets/img/headers/fixing-ipv6-dynamic-pd/ipv6.webp
-  lqip: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAAYACgMBEQACEQEDEQH/xAGiAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgsQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+gEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoLEQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AP4lvCOreBYPCcUGteDtT1HUY4r5pdSsfFLaYJ5JnVbBWspNH1CFLeyhaTzUidJ7q5EEpuYoI5rS5+ghh82qU51cJmeHw+HapKOGq5bHEckIxbq2rRxVGbqVZqFnJShTp+0j7OU5QqU/J/tLhGhKjh814YzHH4+DxTqZjhOInl6rVKso/U1LBzyvG0o4fC0nVdSnSnTrYjELD1HiKdGnWw+I8RcfO/IHzNx5aHHJ4rGWspP+8/zJi7Rive0il8Xl6H//2Q==
+  lqip: data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAACwAwCdASoUAAwAPm0skkWkIqGYBABABsSxgFp0EO/+ZkeBoUqoAAD+/kqnt4vXG+qhzBEZFJYuaQxUDm+aZe868rqf8AFfgAA=
 ---
 
 Before delving into the issue at hand, let's talk about IPv6 and Dynamic PD. Imagine the internet as a giant city where every home, store, and office has a unique address. This address is like an IP address, which is how devices on the internet are identified and can communicate with each other.
@@ -60,7 +61,7 @@ You can read more about that in here:
 
 [ISPs: Simplifying customer IPv6 addressing (Part 1)](https://blog.apnic.net/2017/07/07/isps-simplifying-customer-ipv6-addressing-part-1/){:target="_blank"}
 
-Most users won't notice this as applications often fall back to IPv4. This lack of awareness allows ISPs in India to persist with suboptimal IPv6 configurations.
+Most users won't notice this as applications often fall back to IPv4. This lack of awareness allows ISPs in India to persist with suboptimal IPv6 configurations. ([I documented a more severe ISP issue where AS133301 had no VLAN isolation, exposing customer traffic]({% post_url 2024-04-15-BUM-AS133301 %}).)
 
 ## What Action Did I Take?
 
@@ -100,7 +101,7 @@ The current setup that works for me now is:
 
 Presently, if my ISP changes the PD, my devices will adopt new addresses, and the old ones will be deprecated.
 
-![ifconfig en0](/assets/img/posts/fixing-ipv6-dynamic-pd/ifconfig.webp)_ifconfig en0_
+<img src="/assets/img/posts/fixing-ipv6-dynamic-pd/ifconfig.webp" alt="macOS terminal output showing IPv6 address deprecation via ifconfig en0 command, highlighting deprecated IPv6 addresses" loading="lazy"><em>ifconfig en0</em>
 
 Despite my efforts, convincing my ISP (AS9829) to follow [BCOP-690](https://www.ripe.net/publications/docs/ripe-690){:target="_blank"} and provide a /56 static PD for residential users has proven challenging. State-owned ISPs often prioritize policy-based engineering over engineering-based policies, a topic for another blog post.
 
