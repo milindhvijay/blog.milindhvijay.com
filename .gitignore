@@ -21,3 +21,6 @@ vendor/
 # Environment
 .env
 .env.local
+
+# Node deps (tools/lquip)
+node_modules/
